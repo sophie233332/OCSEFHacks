@@ -1,4 +1,5 @@
 package com.yourname.plantgame.ui.theme
+import androidx.compose.ui.graphics.Color
 
 import android.app.Activity
 import android.os.Build
@@ -33,26 +34,17 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+
+
 @Composable
-fun TESTTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+fun PlantGameTheme(
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
+        colorScheme = MaterialTheme.colorScheme.copy(
+            primary = Color(0xFF4CAF50),  // Green
+            secondary = Color(0xFF8BC34A) // Light green
+        ),
         content = content
     )
 }
