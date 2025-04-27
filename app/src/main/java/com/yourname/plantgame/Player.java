@@ -4,7 +4,7 @@ import java.util.Calendar;
 
 public class Player {
     private String name;
-    private int totalSteps;
+    private int totalSteps=200000;
     private int todaySteps;
     private int water;
     private int soil;
@@ -64,8 +64,8 @@ public class Player {
     }
 
     // Getters
-    //public int getTotalSteps() { return totalSteps; }
-    public int getTotalSteps() { return 10000; }
+    public int getTotalSteps() { return totalSteps; }
+    //public int getTotalSteps() { return 10000; }
     public int getTodaySteps() { return todaySteps; }
     public int getWater() { return water; }
     public int getSoil() { return soil; }
