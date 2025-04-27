@@ -64,7 +64,8 @@ public class Player {
     }
 
     // Getters
-    public int getTotalSteps() { return totalSteps; }
+    //public int getTotalSteps() { return totalSteps; }
+    public int getTotalSteps() { return 10000; }
     public int getTodaySteps() { return todaySteps; }
     public int getWater() { return water; }
     public int getSoil() { return soil; }
