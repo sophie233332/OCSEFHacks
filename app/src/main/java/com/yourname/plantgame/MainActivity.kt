@@ -3,8 +3,11 @@ package com.yourname.plantgame
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -20,6 +24,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.yourname.plantgame.ui.theme.PlantGameTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +44,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun PlantGameScreen() {
     val gameManager = remember { GameManager.getInstance() }
+    val scope = rememberCoroutineScope()
     var showShopDialog by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<Item?>(null) }
     var dropdownExpanded by remember { mutableStateOf(false) }
@@ -51,10 +58,29 @@ fun PlantGameScreen() {
     var plantStatus by remember { mutableStateOf(gameManager.plantGirl.getStatus()) }
     var steps by remember { mutableStateOf(gameManager.player.getTotalSteps()) }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // Background Layer (Background + Character)
+    // Dialog state
+    var showDialog by remember { mutableStateOf(true) }
+    var dialogText by remember { mutableStateOf("") }
+    var dialogAlpha by remember { mutableStateOf(1f) }
+    val textBoxLastingMilliseconds = 6000L
+    val disappearingMilliseconds = 1000L
+
+    // Initial greeting
+    LaunchedEffect(Unit) {
+        dialogText = gameManager.plantGirl.getGreeting()
+        showDialog = true
+        delay(textBoxLastingMilliseconds)
+        animate(
+            initialValue = 1f,
+            targetValue = 0f,
+            animationSpec = tween(durationMillis = disappearingMilliseconds.toInt())
+        ) { value, _ ->
+            dialogAlpha = value
+            if (value <= 0f) showDialog = false
+        }
+    }
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Background Layer
         Box(modifier = Modifier.fillMaxSize()) {
             // Background Image
             Image(
@@ -64,7 +90,7 @@ fun PlantGameScreen() {
                 modifier = Modifier.fillMaxSize()
             )
 
-            // Enlarged Character
+            // Character Image
             Image(
                 painter = painterResource(
                     id = when (plantStage) {
@@ -79,12 +105,49 @@ fun PlantGameScreen() {
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .height(800.dp)
-                    .size(390.dp)
-                    .offset(y =.-70.dp)
+                    .offset(y = (-70).dp)
+                    .clickable {
+                        dialogText = gameManager.plantGirl.getRandomResponse()
+                        showDialog = true
+                        dialogAlpha = 1f
+                        scope.launch {
+                            delay(textBoxLastingMilliseconds)
+                            animate(
+                                initialValue = 1f,
+                                targetValue = 0f,
+                                animationSpec = tween(durationMillis = disappearingMilliseconds.toInt())
+                            ) { value, _ ->
+                                dialogAlpha = value
+                                if (value <= 0f) showDialog = false
+                            }
+                        }
+                    }
             )
         }
 
-        // White Dialog Panel
+        // Chat Dialog - Positioned above white panel but below character
+        if (showDialog) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth(0.8f)
+                    .padding(bottom = 280.dp) // Adjust this to position above white panel
+                    .offset(y=-50.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0x4B000000))
+                    .alpha(dialogAlpha),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = dialogText,
+                    color = Color.White,
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+
+        // White Panel
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
