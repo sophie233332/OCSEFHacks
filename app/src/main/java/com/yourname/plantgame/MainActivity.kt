@@ -24,6 +24,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.yourname.plantgame.ui.theme.PlantGameTheme
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
+import kotlin.math.max
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -62,21 +66,34 @@ fun PlantGameScreen() {
     var showDialog by remember { mutableStateOf(true) }
     var dialogText by remember { mutableStateOf("") }
     var dialogAlpha by remember { mutableStateOf(1f) }
-    val textBoxLastingMilliseconds = 6000L
+    val textBoxLastingMilliseconds = 3000L
     val disappearingMilliseconds = 1000L
+    var currentAnimationJob by remember { mutableStateOf<Job?>(null) }
+    var lastClickTime by remember { mutableStateOf(0L) }
+    val clickCooldown = 500L // 500毫秒冷却时间
 
     // Initial greeting
     LaunchedEffect(Unit) {
+        currentAnimationJob?.cancel()
         dialogText = gameManager.plantGirl.getGreeting()
         showDialog = true
-        delay(textBoxLastingMilliseconds)
-        animate(
-            initialValue = 1f,
-            targetValue = 0f,
-            animationSpec = tween(durationMillis = disappearingMilliseconds.toInt())
-        ) { value, _ ->
-            dialogAlpha = value
-            if (value <= 0f) showDialog = false
+        dialogAlpha = 1f
+        currentAnimationJob = scope.launch {
+            try {
+                delay(textBoxLastingMilliseconds)
+                animate(
+                    initialValue = 1f,
+                    targetValue = 0f,
+                    animationSpec = tween(durationMillis = disappearingMilliseconds.toInt())
+                ) { value, _ ->
+                    dialogAlpha = value
+                    if (value <= 0f) showDialog = false
+                }
+            } catch (e: CancellationException) {
+                // 处理取消
+            } finally {
+                currentAnimationJob = null
+            }
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {
@@ -107,18 +124,34 @@ fun PlantGameScreen() {
                     .height(800.dp)
                     .offset(y = (-70).dp)
                     .clickable {
-                        dialogText = gameManager.plantGirl.getRandomResponse()
+                        val now = System.currentTimeMillis()
+                        if (now - lastClickTime < clickCooldown) return@clickable
+                        lastClickTime = now
+                        // 取消之前的动画
+                        currentAnimationJob?.cancel()
+                        currentAnimationJob = null
+
+                        // 重置状态
                         showDialog = true
                         dialogAlpha = 1f
-                        scope.launch {
-                            delay(textBoxLastingMilliseconds)
-                            animate(
-                                initialValue = 1f,
-                                targetValue = 0f,
-                                animationSpec = tween(durationMillis = disappearingMilliseconds.toInt())
-                            ) { value, _ ->
-                                dialogAlpha = value
-                                if (value <= 0f) showDialog = false
+                        dialogText = gameManager.plantGirl.getRandomResponse()
+
+                        // 启动新动画
+                        currentAnimationJob = scope.launch {
+                            try {
+                                delay(textBoxLastingMilliseconds)
+                                animate(
+                                    initialValue = 1f,
+                                    targetValue = 0f,
+                                    animationSpec = tween(durationMillis = disappearingMilliseconds.toInt())
+                                ) { value, _ ->
+                                    dialogAlpha = value
+                                    if (value <= 0f) showDialog = false
+                                }
+                            } catch (e: CancellationException) {
+                                // 动画被取消时的处理
+                            } finally {
+                                currentAnimationJob = null
                             }
                         }
                     }

@@ -81,8 +81,8 @@ public class PlantGirl {
     }
     // Care actions
     public void giveWater() {
-        growAction(10);
-        careAction(10);
+        growAction(4);
+        careAction(4);
     }
     public void giveSoil() {
         growAction(8);
@@ -104,8 +104,8 @@ public class PlantGirl {
 
     // Growth stage calculation
     private void updateGrowthStage() {
-        if (growth >= 60) growthStage = 3;
-        else if (growth >= 30) growthStage = 2;
+        if (growth >= 100) growthStage = 3;
+        else if (growth >= 50) growthStage = 2;
         else growthStage = 1;
     }
 
