@@ -143,7 +143,7 @@ fun PlantGameScreen() {
                             Item.cake -> cakeCount
                         }
 
-                        if (count > 0) {
+                        if (count >= 0) {
                             DropdownMenuItem(
                                 text = {
                                     Text(
@@ -269,15 +269,25 @@ fun ShopItem(item: Item, price: Int, currentSteps: Int, onClick: () -> Unit) {
         Item.cake -> "Cake (+25 affection)"
     }
 
+    // Define your color scheme
+    val affordableColor = Color(0xFFBB86FC)  // Light purple (can afford)
+    val unaffordableColor = Color(0xFF3700B3) // Dark purple (can't afford)
+    val disabledTextColor = Color(0xFFAAAAAA)  // Gray text when disabled
+
     Button(
         onClick = onClick,
         enabled = enabled,
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (enabled) MaterialTheme.colorScheme.primaryContainer
-            else MaterialTheme.colorScheme.surfaceVariant
+            containerColor = if (enabled) affordableColor else unaffordableColor,
+            contentColor = if (enabled) Color.White else disabledTextColor
         )
     ) {
-        Text("$itemName - $price steps")
+        Text(
+            text = "$itemName - $price steps",
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = if (enabled) FontWeight.Bold else FontWeight.Normal
+            )
+        )
     }
 }
