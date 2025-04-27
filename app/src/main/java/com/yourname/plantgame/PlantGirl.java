@@ -40,7 +40,9 @@ public class PlantGirl {
             "The shelter keeps me safe, but a tree isn't meant to live in a bubble forever.",
             "Sometimes I imagine what it would be like to plant my roots in wild soil, not this protected garden."
         },
-        /*greetings*/{
+    });
+    private final static Random2DArray<String> greetings=new Random2DArray<>(new String[][]{
+            /*greetings*/{
             "Hello there, seedling! I'm Ginku, the last of the ancient Ginkgo spirits.",
             "Oh! A visitor! It gets lonely in this shelter sometimes. I'm so happy to see you!",
             "Welcome, friend! Care to chat with a tree that's older than your entire civilization?",
@@ -71,8 +73,10 @@ public class PlantGirl {
 
         updateGrowthStage();
     }
-
-    public String getText(){
+    public String getGreeting(){
+        return greetings.eliminateRandom();
+    }
+    public String getRandomResponse(){
         return responses.eliminateRandom();
     }
     // Care actions
