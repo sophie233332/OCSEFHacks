@@ -143,7 +143,7 @@ fun PlantGameScreen() {
                             Item.cake -> cakeCount
                         }
 
-                        if (count > 0) {
+                        if (count >= 0) {
                             DropdownMenuItem(
                                 text = {
                                     Text(
