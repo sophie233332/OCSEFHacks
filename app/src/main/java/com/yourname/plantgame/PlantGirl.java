@@ -1,7 +1,9 @@
 package com.yourname.plantgame;
 
+import com.yourname.plantgame.helperclass.Random2DArray;
+
 public class PlantGirl {
-    private final static String[][] responses = new String[][]{
+    private final static Random2DArray<String> responses = new Random2DArray<>(new String[][]{
         /*facts*/{
             "Did you know my family has been around for over 200 million years? We were hanging out with dinosaurs before it was cool!",
             "My leaves are pretty unique - see these fan shapes? Once you see a Ginkgo leaf, you never forget it! We're pretty memorable that way.",
@@ -45,7 +47,7 @@ public class PlantGirl {
             "Greetings, human seedling! I'm Ginku, at your service!",
             "Well hello there! Did the wind blow you my way? I'm Ginku!"
         }
-    };
+    });
 
     private int affection;  // 0-100
     private int growth;
@@ -70,6 +72,9 @@ public class PlantGirl {
         updateGrowthStage();
     }
 
+    public String getText(){
+        return responses.eliminateRandom();
+    }
     // Care actions
     public void giveWater() {
         growAction(10);
