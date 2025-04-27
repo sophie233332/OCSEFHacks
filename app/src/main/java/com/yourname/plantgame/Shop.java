@@ -1,22 +1,29 @@
 package com.yourname.plantgame;
 
-public class Shop {
-    private static final int[] PRICES = {500, 800, 1500}; // Water, Soil, Cake
+import java.util.EnumMap;
+import java.util.Map;
 
-    public boolean buyItem(Player player, int itemType) {
-        if (player.getTotalSteps() >= PRICES[itemType]) {
-            switch (itemType) {
-                case 0: player.useWater(); break;
-                case 1: player.useSoil(); break;
-                case 2: player.useCake(); break;
+public class Shop {
+    private static EnumMap<Item, Integer> PRICES=new EnumMap<>(Item.class);
+    static {
+        PRICES.put(Item.water, 500);
+        PRICES.put(Item.soil, 800);
+        PRICES.put(Item.cake, 1500);
+    }
+    public boolean buyItem(Player player, Item item) {
+        if (player.getTotalSteps() >= PRICES.get(item)) {
+            switch (item) {
+                case water: player.useWater(); break;
+                case soil: player.useSoil(); break;
+                case cake: player.useCake(); break;
             }
-            player.addSteps(-PRICES[itemType]);
+            player.addSteps(-PRICES.get(item));
             return true;
         }
         return false;
     }
 
-    public int getPrice(int itemType) {
-        return PRICES[itemType];
+    public int getPrice(Item itemType) {
+        return PRICES.get(itemType);
     }
 }
