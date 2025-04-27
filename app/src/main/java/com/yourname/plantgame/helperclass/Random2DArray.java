@@ -1,6 +1,7 @@
 package com.yourname.plantgame.helperclass;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Random2DArray<T>{
@@ -32,7 +33,7 @@ public class Random2DArray<T>{
     public T eliminateRandom(){
         if(arrayList.isEmpty()){
             for(int i=0;i<array2D.length;i++){
-                arrayList.addAll(List.of(array2D[i]));
+                arrayList.addAll(Arrays.asList(array2D[i]));
             }
         }
         return arrayList.remove(randomInt(0,arrayList.size()));
