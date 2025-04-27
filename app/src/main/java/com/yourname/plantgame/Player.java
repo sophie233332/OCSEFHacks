@@ -15,7 +15,7 @@ public class Player {
         this.name = name;
         this.water = 3;  // Starting water
         this.soil = 2;   // Starting soil
-        this.cakes = 0;   // No cakes initially
+        this.cakes = 0;   // No cakes
         this.lastUpdateTime = System.currentTimeMillis();
     }
 
